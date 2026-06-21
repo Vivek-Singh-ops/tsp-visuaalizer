@@ -1,0 +1,52 @@
+/* theme.css — design tokens.
+   Direction: a navigation instrument panel / nautical chart, not a
+   generic dashboard. Dark ink background, paper-white cities, an amber
+   "current best tour" line (the needle that's found its bearing), a
+   muted teal for in-progress construction edges, and a coral highlight
+   for whatever the algorithm is actively comparing right now. */
+
+:root {
+  /* ---- Color: 6 named hexes ---- */
+  --color-ink:          #0e1525;   /* page background, deep chart-navy */
+  --color-panel:        #141d31;   /* sidebar / card surface, one step up from ink */
+  --color-paper:        #f2efe4;   /* node fill, "paper" chart color */
+  --color-route:        #e8a33d;   /* the current best/complete tour — the amber bearing line */
+  --color-construction: #3e7c7c;   /* in-progress / partial construction edges — muted teal */
+  --color-active:       #e0573f;   /* whatever the algorithm is comparing right now — coral */
+  --color-node:         #f2efe4;   /* city dot fill on the blank canvas — same as paper */
+
+  --color-text:         #f2efe4;
+  --color-text-dim:     #aab4c8;
+  --color-text-faint:   #6b7690;
+  --color-border:       rgba(242, 239, 228, 0.12);
+  --color-border-strong:rgba(242, 239, 228, 0.22);
+
+  /* ---- Type ---- */
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body:    "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono:    "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --size-xs:   0.72rem;
+  --size-sm:   0.85rem;
+  --size-base: 1rem;
+  --size-md:   1.15rem;
+  --size-lg:   1.5rem;
+  --size-xl:   2.1rem;
+  --size-xxl:  3rem;
+
+  /* ---- Spacing scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --sidebar-width: 360px;
+  --header-height: 64px;
+}

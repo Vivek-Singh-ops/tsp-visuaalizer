@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tour Board — TSP Algorithm Visualizer</title>
+  <meta name="description" content="Plot cities on a blank canvas or a real map, then watch construction and improvement algorithms build and refine a traveling salesman tour step by step." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- MapLibre GL JS (renders OpenFreeMap vector tiles, built from OpenStreetMap data) -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+  <!-- Styles, in dependency order -->
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- ============ Header ============ -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark">Tour Board</span>
+        <span class="brand-tag">TSP Visualizer</span>
+      </div>
+
+      <div class="mode-toggle" role="group" aria-label="Map mode">
+        <button type="button" data-mode="canvas" class="active">Blank canvas</button>
+        <button type="button" data-mode="map">Real map</button>
+      </div>
+
+      <nav class="header-links">
+        <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>
+        <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>
+        <a href="https://github.com/" target="_blank" rel="noopener">Source</a>
+      </nav>
+    </header>
+
+    <!-- ============ Main: chart + sidebar ============ -->
+    <div class="app-main">
+
+      <section class="chart-area">
+        <div class="chart-stage">
+          <div id="canvas-stage">
+            <canvas id="tsp-canvas"></canvas>
+          </div>
+          <div id="map-stage" class="hidden"></div>
+          <div id="chart-hint" class="chart-hint">Click anywhere to plot a city. Add at least 3 to run an algorithm.</div>
+          <div id="toast" class="toast"></div>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stat">
+            <span class="stat-label">Cities</span>
+            <span class="stat-value" id="stat-cities">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Tour length</span>
+            <span class="stat-value is-route" id="stat-length">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Best found</span>
+            <span class="stat-value is-best" id="stat-best">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Steps</span>
+            <span class="stat-value" id="stat-steps">0</span>
+          </div>
+          <div class="run-log" id="run-log"></div>
+        </div>
+      </section>
+
+      <!-- ============ Sidebar: controls ============ -->
+      <aside class="sidebar">
+
+        <div class="panel-section">
+          <h2 class="panel-section-title"><span class="step-num">1</span> Plot cities</h2>
+          <p class="panel-hint">Click the chart to drop points, or scatter a random set to start quickly.</p>
+          <div class="btn-row">
+            <button class="btn" id="random-btn" type="button">Random cities</button>
+            <button class="btn btn-ghost" id="clear-btn" type="button">Clear all</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="panel-section">
+          <h2 class="panel-section-title"><span class="step-num">2</span> Construction</h2>
+          <p class="panel-hint">Builds a complete tour from nothing. Run alone, or queue it before an improvement step.</p>
+          <div class="field-row">
+            <label for="construction-select">Algorithm</label>
+            <select id="construction-select">
+              <option value="nearestNeighbor">Nearest Neighbor</option>
+              <option value="greedyEdge">Greedy Edge</option>
+              <option value="cheapestInsertion">Cheapest Insertion</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="run-construction-only" type="button">Run now</button>
+            <button class="btn btn-ghost" id="add-construction" type="button">Add to pipeline</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="panel-section">
+          <h2 class="panel-section-title"><span class="step-num">3</span> Improvement</h2>
+          <p class="panel-hint">Refines whatever tour is currently on the board. Best used right after a construction step.</p>
+          <div class="field-row">
+            <label for="improvement-select">Algorithm</label>
+            <select id="improvement-select">
+              <option value="twoOpt">2-opt</option>
+              <option value="orOpt">Or-opt</option>
+              <option value="simulatedAnnealing">Simulated Annealing</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="run-improvement-only" type="button">Run now</button>
+            <button class="btn btn-ghost" id="add-improvement" type="button">Add to pipeline</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="panel-section">
+          <h2 class="panel-section-title">Pipeline</h2>
+          <p class="panel-hint">Chain steps to run back to back — try Nearest Neighbor → 2-opt.</p>
+          <div class="pipeline-chain" id="pipeline-chain"></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="run-pipeline" type="button" disabled>Run pipeline</button>
+            <button class="btn btn-ghost" id="clear-pipeline" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="panel-section">
+          <h2 class="panel-section-title">Playback</h2>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="play-btn" type="button" disabled>▶ Play</button>
+            <button class="btn" id="pause-btn" type="button" disabled>⏸ Pause</button>
+            <button class="btn" id="step-btn" type="button" disabled>⏭ Step</button>
+            <button class="btn btn-ghost" id="reset-btn" type="button">↺ Reset run</button>
+          </div>
+          <div class="field-row">
+            <label for="speed-slider">Speed</label>
+            <div class="speed-row">
+              <input type="range" id="speed-slider" min="20" max="800" step="10" value="250" />
+              <span id="speed-label">250ms</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="panel-section">
+          <h2 class="panel-section-title">Legend</h2>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-swatch" style="background: var(--color-route)"></span> Complete tour</div>
+            <div class="legend-item"><span class="legend-swatch" style="background: var(--color-construction)"></span> Partial / in-progress path</div>
+            <div class="legend-item"><span class="legend-swatch" style="background: var(--color-active); border-top: 2px dashed var(--color-active); height:0;"></span> Edges being compared</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--color-active)"></span> Active city</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- Scripts, in dependency order -->
+  <script src="js/geometry.js"></script>
+  <script src="js/construction.js"></script>
+  <script src="js/improvement.js"></script>
+  <script src="js/canvasRenderer.js"></script>
+  <script src="js/mapAdapter.js"></script>
+  <script src="js/controller.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
