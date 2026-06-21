@@ -7,19 +7,19 @@
 
 :root {
   /* ---- Color: 6 named hexes ---- */
-  --color-ink:          #0e1525;   /* page background, deep chart-navy */
-  --color-panel:        #141d31;   /* sidebar / card surface, one step up from ink */
+  --color-ink:          #e8f5e9;   /* page background, deep chart-navy */
+  --color-panel:        #ffffff;   /* sidebar / card surface, one step up from ink */
   --color-paper:        #f2efe4;   /* node fill, "paper" chart color */
   --color-route:        #e8a33d;   /* the current best/complete tour — the amber bearing line */
   --color-construction: #3e7c7c;   /* in-progress / partial construction edges — muted teal */
   --color-active:       #e0573f;   /* whatever the algorithm is comparing right now — coral */
   --color-node:         #f2efe4;   /* city dot fill on the blank canvas — same as paper */
 
-  --color-text:         #f2efe4;
-  --color-text-dim:     #aab4c8;
-  --color-text-faint:   #6b7690;
-  --color-border:       rgba(242, 239, 228, 0.12);
-  --color-border-strong:rgba(242, 239, 228, 0.22);
+  --color-text: #1a1a1a; 
+  --color-text-dim: #4a4a4a;
+  --color-text-faint: #757575;
+  --color-border: rgba(0, 0, 0, 0.12);
+  --color-border-strong: rgba(0, 0, 0, 0.22);
 
   /* ---- Type ---- */
   --font-display: "Space Grotesk", "Segoe UI", sans-serif;
